@@ -1,3 +1,26 @@
+*.iml
+.gradle
+.DS_Store
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/local.properties
+
+
+# Generated files
+bin/
+gen/
+out/
+
+# gradle files
+./idea
+.gradle/
+build/
+
+
 # Compiled class file
 *.class
 
