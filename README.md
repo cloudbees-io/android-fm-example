@@ -17,7 +17,7 @@ To get started with the android-fm-example project, follow these steps:
 Clone the android-fm-example repository to your local machine using Git:
 
 ```shell
-git@github.com:cloudbees-io/android-fm-example.git
+git clone git@github.com:cloudbees-io/android-fm-example.git
 ```
 3. **Install ROX dependancy:**
    - Add the following in the dependencies block of your build.gradle file:
