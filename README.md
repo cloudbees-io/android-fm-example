@@ -10,7 +10,7 @@ To get started with the android-fm-example project, follow these steps:
 
 1. **Get key from Cloudbees account:** 
 
-    - Create a CloudBees Feature Management account. See [Signup Page](https://app.rollout.io/signup) to create an account.
+    - Create a CloudBees Feature Management account. See [Signup Page](https://cloudbees.io/signup) to create an account.
     - Get your environment key. Copy your environment key from App settings > Environments > Key.
 
 2. **Clone the Repository:** 
@@ -41,7 +41,7 @@ git clone git@github.com:cloudbees-io/android-fm-example.git
 
 6. **Run the android-fm-example App:** 
 
-    - The flag name is automatically added to your cloudbees dashboardafter running the application.
+    - The flag name is automatically added to your cloudbees dashboard after running the application.
 
 ## Use the platform to update flag values
 
