@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
         // Initialize Flag container class that we created earlier
         flags = Flags()
 
-        // Register the flags container with Rollout
+        // Register the flags container with CloudBees Feature Management
         Rox.register(flags)
 
         // Building options
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
             })
             .build()
 
-        // Setup the Rollout key with options
+        // Setup the SDK key with options
         Rox.setup(application, options)
 
     }
