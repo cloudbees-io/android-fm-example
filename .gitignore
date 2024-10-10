@@ -1,8 +1,29 @@
+*.iml
+.gradle
+.DS_Store
+/.idea
+/local.properties
+
+
+# Generated files
+bin/
+gen/
+out/
+
+# gradle files
+./idea
+.gradle/
+build/
+
+
 # Compiled class file
 *.class
 
 # Log file
 *.log
+
+# cache
+**/.DS_Store
 
 # BlueJ files
 *.ctxt
@@ -22,3 +43,4 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+.DS_Store
