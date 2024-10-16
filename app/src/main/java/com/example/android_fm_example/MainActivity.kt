@@ -1,10 +1,14 @@
 package com.example.android_fm_example
 
+import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.content.IntentFilter
+import android.net.ConnectivityManager
+import android.net.Network
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -28,6 +32,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var centerLabel: TextView
     private lateinit var headerLabel: TextView
     private lateinit var bottomLabel: TextView
+//    private lateinit var connectivityReceiver: ConnectivityReceiver
+    private lateinit var connectivityManager: ConnectivityManager
+    private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +52,25 @@ class MainActivity : ComponentActivity() {
         // Register the flags container with CloudBees Feature Management
         Rox.register(flags)
 
-        // Building options
+        connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                Log.i("MainActivity", "Network Available")
+                val options = roxOptions()
+                // Setup the SDK key with options
+                Rox.setup(application, options)
+            }
+            override fun onLost(network: Network) {
+                super.onLost(network)
+                Log.i("MainActivity", "Network lost")
+                // Handle network lost if needed
+            }
+        }
+
+    }
+
+    private fun roxOptions(): RoxOptions? {
         val options = RoxOptions.Builder()
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
@@ -61,10 +86,17 @@ class MainActivity : ComponentActivity() {
                 }
             })
             .build()
+        return options
+    }
 
-        // Setup the SDK key with options
-        Rox.setup(application, options)
+    override fun onStart() {
+        super.onStart()
+        connectivityManager.registerDefaultNetworkCallback(networkCallback)
+    }
 
+    override fun onStop() {
+        super.onStop()
+        connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
     private fun checkFlagsValue() {
