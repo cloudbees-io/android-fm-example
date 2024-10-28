@@ -1,8 +1,8 @@
 
-# Example Kotlin Android application for CloudBees platform feature management
-Use this example application to integrate with the CloudBees platform and test out feature management. After integrating, watch the application display change in response to any updates you make to flag values in the platform.
+# Example Kotlin Android application for CloudBees platform Feature management
+Use this example application to integrate with the CloudBees platform and test feature management. After integrating, watch the application display change in response to any updates you make to flag values in the platform.
 
-In the example kotlin application, the ROX SDK is already set up, and feature flags are already coded in.
+In the example Kotlin application, the ROX SDK is already set up, and feature flags are already coded in.
 
 
 ## Running This Project
@@ -10,7 +10,7 @@ To get started with the android-fm-example project, follow these steps:
 
 1. **Get key from Cloudbees account:** 
 
-    - Create a CloudBees Feature Management account. See [Signup Page](https://cloudbees.io/signup) to create an account.
+    - Create a CloudBees Feature management account. See [Signup Page](https://cloudbees.io/signup) to create an account.
     - Get your environment key. Copy your environment key from App settings > Environments > Key.
 
 2. **Clone the Repository:** 
@@ -19,15 +19,15 @@ Clone the android-fm-example repository to your local machine using Git:
 ```shell
 git clone git@github.com:cloudbees-io/android-fm-example.git
 ```
-3. **Install ROX dependancy:**
+3. **Install ROX dependency:**
    - Add the following in the dependencies block of your build.gradle file:
    `implementation("io.rollout.rox:rox-android:5.0.5")`
-   - After adding dependancy Sync project
+   - After adding the dependency Sync project
  
 
 4. **Open the Project:**
  
-    - Reopen your project in Android studio.
+    - Reopen your project in Android Studio.
 
 5. **Setup key from Cloudbees account:** 
 
@@ -41,11 +41,11 @@ git clone git@github.com:cloudbees-io/android-fm-example.git
 
 6. **Run the android-fm-example App:** 
 
-    - The flag name is automatically added to your cloudbees dashboard after running the application.
+    - After running the application, The flag name is automatically added to your CloudBees dashboard.
 
 ## Use the platform to update flag values
 
-Now that your application is running, go to your environment in Feature management to display the flags available in the example application:
+Now that your application is running go to your environment in Feature management to display the flags available in the example application:
 
 Table 1. Feature flags in the example application.
 
@@ -53,7 +53,7 @@ Table 1. Feature flags in the example application.
 |---------------------|------------|--------------------------------|
 | `showMessage`| Boolean | Turns the message show or hide |
 | `message`| String | Sets the Message string.|
-| `fontColor`| String | Sets the font color. The flag value has the following variations: red, green,yellow or blue.|
+| `fontColor`| String | Sets the font color. The flag value has the following variations: red, green, yellow, or blue.|
 | `fontSize` | Int32   | Sets the font size in pixels. The flag value has the following variations: 12, 14, or 18.|
 | `specialNumber` | Double   | Sets the number with double. The flag value has the following variations: 2.72, 0.577, 3.14|
 
