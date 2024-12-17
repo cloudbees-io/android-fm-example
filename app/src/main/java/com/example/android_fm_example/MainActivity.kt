@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
 
     private fun roxOptions(): RoxOptions? {
         val options = RoxOptions.Builder()
+            .withDisableSignatureVerification(true)
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
                     fetcherResults?.let {
@@ -136,6 +137,7 @@ class MainActivity : ComponentActivity() {
             "Blue" -> Color.BLUE
             "Green" -> Color.GREEN
             "Yellow" -> Color.YELLOW
+            "Red" -> Color.RED
             else -> Color.BLACK // Default color
         }
     }
