@@ -7,7 +7,8 @@ In the example Kotlin application, the ROX SDK is already set up, and feature fl
 ## Running This Project
 To get started with the android-fm-example project, follow these steps:
 
-1. **Get the SDK key:** 
+1. **Get the SDK key:**
+   
     - Create a CloudBees Feature management account. See [Signup Page](https://cloudbees.io/signup) to create an account.
     - Locate and copy your SDK key:
           -- Navigate to Feature management > Flags.
@@ -18,7 +19,7 @@ To get started with the android-fm-example project, follow these steps:
          -- Select the Installation instruction buttons on the top right-hand side of the page.
          -- The UI guides you through creating an environment, linking the environment to an application, and installing the SDK.
       
-2. **Clone the Repository:** 
+3. **Clone the Repository:** 
 Clone the android-fm-example repository to your local machine using Git:
 
 ```shell
