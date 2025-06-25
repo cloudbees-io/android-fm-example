@@ -1,6 +1,6 @@
 
 # Example Kotlin Android application for CloudBees platform feature management
-Use this example application to integrate with the CloudBees platform and test feature management. After integrating, watch the application display change in response to any updates you make to flag values in the platform.
+Use this example application to integrate with the CloudBees platform and test feature management. After integrating, observe the application display change in response to any updates you make to flag values in the platform.
 
 In the example Kotlin application, the ROX SDK is already set up, and feature flags are already coded in.
 
