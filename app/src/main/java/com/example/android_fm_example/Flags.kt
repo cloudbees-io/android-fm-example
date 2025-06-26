@@ -9,6 +9,9 @@ import io.rollout.flags.RoxEnum
 
 // Create Roxflags in the Flags container class
 class Flags : RoxContainer {
+    init {
+        android.util.Log.d("Flags", "Creating Flags container")
+    }
     // Define the feature flags
     val showMessage = RoxFlag(false)
     val message = RoxString("This is default message; try changing some flag values!")

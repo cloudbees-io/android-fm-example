@@ -16,7 +16,7 @@
         tools:targetApi="31">
         <meta-data
             android:name="rox.apiKey"
-            android:value="<Your Cloudbees Feature Management SDK Key>" />
+            android:value="290fb9d0-4c36-4795-67cf-92dd0054e62f" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
