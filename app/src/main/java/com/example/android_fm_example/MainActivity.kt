@@ -45,10 +45,8 @@ class MainActivity : ComponentActivity() {
         flags = Flags()
         secondFlags = SecondFlags()
     }
-    private lateinit var centerLabel: TextView
-    private lateinit var secondCenterLabel: TextView
-    private lateinit var headerLabel: TextView
-    private lateinit var bottomLabel: TextView
+    private lateinit var box1FlagValue: TextView
+    private lateinit var box2FlagValue: TextView
     private lateinit var connectivityManager: ConnectivityManager
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
     
@@ -59,17 +57,11 @@ class MainActivity : ComponentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
-        headerLabel = findViewById(R.id.headerText)
-        bottomLabel = findViewById(R.id.bottomText)
-        centerLabel = findViewById(R.id.centerLabel)
-        secondCenterLabel = findViewById(R.id.secondCenterLabel)
+        box1FlagValue = findViewById(R.id.box1FlagValue)
+        box2FlagValue = findViewById(R.id.box2FlagValue)
         
-        headerLabel.text = "CloudBees Feature Management - Multiple Instances Demo"
-        bottomLabel.text = "Two separate SDK instances with different configurations"
-        centerLabel.text = "Loading first instance..."
-        secondCenterLabel.text = "Loading second instance..."
-        centerLabel.visibility = View.VISIBLE
-        secondCenterLabel.visibility = View.VISIBLE
+        box1FlagValue.text = "Loading first instance..."
+        box2FlagValue.text = "Loading second instance..."
         
         // Initialize both Flag containers
         flags = Flags()
@@ -133,8 +125,8 @@ class MainActivity : ComponentActivity() {
             Log.e(TAG, "Error initializing Rox instances", e)
             Log.e(TAG, "Stack trace: ${e.stackTraceToString()}")
             runOnUiThread {
-                centerLabel.text = "Error initializing first instance: ${e.message}"
-                secondCenterLabel.text = "Error initializing second instance: ${e.message}"
+                box1FlagValue.text = "Error initializing first instance: ${e.message}"
+                box2FlagValue.text = "Error initializing second instance: ${e.message}"
             }
         }
 
@@ -181,10 +173,10 @@ class MainActivity : ComponentActivity() {
             val specialNumber = flags.specialNumber.value
 
             runOnUiThread {
-                centerLabel.setTextColor(Color.parseColor(fontColor))
-                centerLabel.textSize = fontSize.toFloat()
-                centerLabel.text = if (showMessage) message else "First instance flag is disabled"
-                centerLabel.visibility = View.VISIBLE
+                box1FlagValue.setTextColor(Color.parseColor(fontColor))
+                box1FlagValue.textSize = fontSize.toFloat()
+                box1FlagValue.text = message
+                box1FlagValue.visibility = if (showMessage) View.VISIBLE else View.GONE
             }
             Log.i(TAG, "First Instance Values - Color: $fontColor, Size: $fontSize, Number: $specialNumber, Message: $message, Show: $showMessage")
         } catch (e: Exception) {
@@ -201,10 +193,10 @@ class MainActivity : ComponentActivity() {
             val secondSpecialNumber = secondFlags.secondSpecialNumber.value
 
             runOnUiThread {
-                secondCenterLabel.setTextColor(Color.parseColor(secondFontColor))
-                secondCenterLabel.textSize = secondFontSize.toFloat()
-                secondCenterLabel.text = if (showSecondMessage) secondMessage else "Second instance flag is disabled"
-                secondCenterLabel.visibility = View.VISIBLE
+                box2FlagValue.setTextColor(Color.parseColor(secondFontColor))
+                box2FlagValue.textSize = secondFontSize.toFloat()
+                box2FlagValue.text = secondMessage
+                box2FlagValue.visibility = if (showSecondMessage) View.VISIBLE else View.GONE
             }
             Log.i(TAG, "Second Instance Values - Color: $secondFontColor, Size: $secondFontSize, Number: $secondSpecialNumber, Message: $secondMessage, Show: $showSecondMessage")
         } catch (e: Exception) {

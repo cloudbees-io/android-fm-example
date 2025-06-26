@@ -52,9 +52,10 @@ android {
 dependencies {
     implementation("io.rollout.rox:rox-android:6.0.1-SNAPSHOT")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation("androidx.activity:activity-compose:1.8.1")
+    implementation("androidx.cardview:cardview:1.0.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
