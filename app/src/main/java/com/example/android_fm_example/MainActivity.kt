@@ -9,34 +9,61 @@ import android.view.View
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import io.rollout.android.RoxInstance
 import io.rollout.android.RoxManager
 import io.rollout.android.client.RoxOptions
+import io.rollout.configuration.RoxContainer
+import io.rollout.flags.RoxFlag
+import io.rollout.flags.RoxString
+import io.rollout.flags.RoxInt
 import io.rollout.client.ConfigurationFetchedHandler
 import io.rollout.client.FetcherResults
 
 class MainActivity : ComponentActivity() {
     companion object {
-        private val firstSdkKey = "290fb9d0-4c36-4795-67cf-92dd0054e62f"
+        private val firstSdkKey = "d3c0f3d8-30a2-4524-98bd-915823021a8e"
         private val firstInstanceId = "first"
-        private val secondSdkKey = "aad64536-18b4-4056-64ab-04fc76246895"
+        private val secondSdkKey = "b6f19d8b-c8a2-43f8-8564-467ea15eb1f9"
         private val secondInstanceId = "second"
     }
 
-    private lateinit var flags: Flags
-    private lateinit var secondFlags: SecondFlags
+    private val flags = Flags()
+    private val secondFlags = SecondFlags()
     private lateinit var firstInstance: RoxInstance
     private lateinit var secondInstance: RoxInstance
 
-    init {
-        flags = Flags()
-        secondFlags = SecondFlags()
+    class Flags : RoxContainer {
+        val fontColor = RoxString("blue")
+        val fontSize = RoxInt(16)
+        val message = RoxString("Hello from first instance!")
+        val showMessage1 = RoxFlag(true)
     }
-    private lateinit var box1FlagValue: TextView
-    private lateinit var box2FlagValue: TextView
+
+    class SecondFlags : RoxContainer {
+        val secondFontColor = RoxString("green")
+        val secondFontSize = RoxInt(20)
+        val secondMessage = RoxString("Hello from second instance!")
+        val showSecondMessage1 = RoxFlag(true)
+    }
+    private lateinit var instancesRecyclerView: RecyclerView
+    private lateinit var instanceAdapter: InstanceAdapter
     private lateinit var connectivityManager: ConnectivityManager
+
+    private val instances = mutableListOf(
+        Instance(firstInstanceId, firstSdkKey, flags),
+        Instance(secondInstanceId, secondSdkKey, secondFlags)
+    )
+
+    data class Instance(
+        val id: String,
+        val sdkKey: String,
+        val flags: RoxContainer,
+        var roxInstance: RoxInstance? = null
+    )
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
-    
+
     // Note: Instance IDs are defined at the top of the class
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,15 +71,18 @@ class MainActivity : ComponentActivity() {
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContentView(R.layout.activity_main)
-        box1FlagValue = findViewById(R.id.box1FlagValue)
-        box2FlagValue = findViewById(R.id.box2FlagValue)
-        
-        box1FlagValue.text = "Loading first instance..."
-        box2FlagValue.text = "Loading second instance..."
-        
-        // Initialize both Flag containers
-        flags = Flags()
-        secondFlags = SecondFlags()
+
+        instancesRecyclerView = findViewById(R.id.instancesRecyclerView)
+        instanceAdapter = InstanceAdapter()
+        instancesRecyclerView.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = instanceAdapter
+        }
+
+        // Initialize with loading state
+        instanceAdapter.updateInstances(instances.map {
+            InstanceItem(maskSdkKey(it.sdkKey), "Loading ${it.id} instance...")
+        })
 
         // Create RoxOptions for first instance
         val firstOptions = RoxOptions.Builder()
@@ -60,7 +90,7 @@ class MainActivity : ComponentActivity() {
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
                     fetcherResults?.let {
-                        runOnUiThread { updateFirstInstanceUI() }
+                        runOnUiThread { updateInstancesUI() }
                     }
                 }
             })
@@ -72,7 +102,7 @@ class MainActivity : ComponentActivity() {
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
                     fetcherResults?.let {
-                        runOnUiThread { updateSecondInstanceUI() }
+                        runOnUiThread { updateInstancesUI() }
                     }
                 }
             })
@@ -90,8 +120,14 @@ class MainActivity : ComponentActivity() {
             secondInstance.fetch()
         } catch (e: Exception) {
             runOnUiThread {
-                box1FlagValue.text = "Error initializing first instance: ${e.message}"
-                box2FlagValue.text = "Error initializing second instance: ${e.message}"
+                val errorInstances = instances.map { instance ->
+                    InstanceItem(
+                        sdkKey = maskSdkKey(instance.sdkKey),
+                        value = "Error initializing instance: ${e.message}",
+                        isVisible = true
+                    )
+                }
+                instanceAdapter.updateInstances(errorInstances)
             }
         }
 
@@ -124,45 +160,51 @@ class MainActivity : ComponentActivity() {
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
-    private fun updateFirstInstanceUI() {
-        try {
-            val fontColor = flags.fontColor.value
-            val fontSize = flags.fontSize.value
-            val message = flags.message.value
-            val showMessage = flags.showMessage.isEnabled
-
-            runOnUiThread {
-                box1FlagValue.setTextColor(Color.parseColor(fontColor))
-                box1FlagValue.textSize = fontSize.toFloat()
-                box1FlagValue.text = message
-                box1FlagValue.visibility = if (showMessage) View.VISIBLE else View.GONE
+    private fun updateInstancesUI() {
+        val updatedInstances = instances.map { instance ->
+            when (instance.flags) {
+                is Flags -> {
+                    try {
+                        val flags = instance.flags as Flags
+                        InstanceItem(
+                            sdkKey = maskSdkKey(instance.sdkKey),
+                            value = flags.message.value,
+                            isVisible = flags.showMessage1.isEnabled,
+                            fontColor = flags.fontColor.value,
+                            fontSize = flags.fontSize.value
+                        )
+                    } catch (e: Exception) {
+                        InstanceItem(maskSdkKey(instance.sdkKey), "Error: ${e.message}", false)
+                    }
+                }
+                is SecondFlags -> {
+                    try {
+                        val flags = instance.flags as SecondFlags
+                        InstanceItem(
+                            sdkKey = maskSdkKey(instance.sdkKey),
+                            value = flags.secondMessage.value,
+                            isVisible = flags.showSecondMessage1.isEnabled,
+                            fontColor = flags.secondFontColor.value,
+                            fontSize = flags.secondFontSize.value
+                        )
+                    } catch (e: Exception) {
+                        InstanceItem(maskSdkKey(instance.sdkKey), "Error: ${e.message}", false)
+                    }
+                }
+                else -> InstanceItem(maskSdkKey(instance.sdkKey), "Unknown flag type", false)
             }
-        } catch (e: Exception) {
-            box1FlagValue.visibility = View.GONE
+        }
+        runOnUiThread {
+            instanceAdapter.updateInstances(updatedInstances)
         }
     }
 
-    private fun updateSecondInstanceUI() {
-        try {
-            val secondFontColor = secondFlags.secondFontColor.value
-            val secondFontSize = secondFlags.secondFontSize.value
-            val secondMessage = secondFlags.secondMessage.value
-            val showSecondMessage = secondFlags.showSecondMessage.isEnabled
-
-            runOnUiThread {
-                box2FlagValue.setTextColor(Color.parseColor(secondFontColor))
-                box2FlagValue.textSize = secondFontSize.toFloat()
-                box2FlagValue.text = secondMessage
-                box2FlagValue.visibility = if (showSecondMessage) View.VISIBLE else View.GONE
-            }
-        } catch (e: Exception) {
-            box2FlagValue.visibility = View.GONE
-        }
+    private fun maskSdkKey(key: String): String {
+        return if (key.length > 4) key.take(4) + "****" else key
     }
 
     private fun checkFlagsValue() {
-        updateFirstInstanceUI()
-        updateSecondInstanceUI()
+        updateInstancesUI()
     }
 
     private fun getColorFromFlag(color: String): Int {

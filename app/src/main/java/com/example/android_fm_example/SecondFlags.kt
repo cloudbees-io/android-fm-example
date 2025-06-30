@@ -13,7 +13,7 @@ class SecondFlags : RoxContainer {
         android.util.Log.d("SecondFlags", "Creating SecondFlags container")
     }
     // Define different feature flags for second instance
-    val showSecondMessage = RoxFlag(false)
+    val showSecondMessage1 = RoxFlag(false)
     val secondMessage = RoxString("This is second instance message!")
     val secondFontColor = RoxString("Red", arrayOf("White", "Blue", "Green", "Yellow", "Red"))
     val secondFontSize = RoxInt(18, intArrayOf(14, 18, 24))

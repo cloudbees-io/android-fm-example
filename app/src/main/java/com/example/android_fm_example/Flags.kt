@@ -13,7 +13,7 @@ class Flags : RoxContainer {
         android.util.Log.d("Flags", "Creating Flags container")
     }
     // Define the feature flags
-    val showMessage = RoxFlag(false)
+    val showMessage1 = RoxFlag(false)
     val message = RoxString("This is default message; try changing some flag values!")
     val fontColor = RoxString("Yellow", arrayOf("White", "Blue", "Green", "Yellow", "Red"))
     val fontSize = RoxInt(14, intArrayOf(14, 18, 24))
