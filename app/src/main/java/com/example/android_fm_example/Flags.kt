@@ -14,11 +14,11 @@ class Flags : RoxContainer {
     }
     // Define the feature flags
     val showMessage1 = RoxFlag(false)
-    val message = RoxString("This is default message; try changing some flag values!")
-    val fontColor = RoxString("Yellow", arrayOf("White", "Blue", "Green", "Yellow", "Red"))
-    val fontSize = RoxInt(14, intArrayOf(14, 18, 24))
-    val specialNumber = RoxDouble(3.14, doubleArrayOf(2.71, 0.577))
-    val titleColorsEnum = RoxEnum<Color>(Color.WHITE)
+    val message1 = RoxString("This is default message; try changing some flag values!")
+//    val fontColor = RoxString("Yellow", arrayOf("White", "Blue", "Green", "Yellow", "Red"))
+//    val fontSize = RoxInt(14, intArrayOf(14, 18, 24))
+//    val specialNumber = RoxDouble(3.14, doubleArrayOf(2.71, 0.577))
+//    val titleColorsEnum = RoxEnum<Color>(Color.WHITE)
 
     enum class Color {
         WHITE, BLUE, GREEN, YELLOW, RED

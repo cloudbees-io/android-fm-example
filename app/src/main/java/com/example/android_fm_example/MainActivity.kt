@@ -23,10 +23,10 @@ import io.rollout.client.FetcherResults
 
 class MainActivity : ComponentActivity() {
     companion object {
-        private val firstSdkKey = "d3c0f3d8-30a2-4524-98bd-915823021a8e"
-        private val firstInstanceId = "first"
-        private val secondSdkKey = "b6f19d8b-c8a2-43f8-8564-467ea15eb1f9"
-        private val secondInstanceId = "second"
+        private val firstSdkKey = "5fff5164-414f-4bdd-b8d0-a42225e42c8b"
+        private val firstInstanceId = "default"
+        private val secondSdkKey = "f8fa95ff-5a6b-4677-94c1-c00c87afa023"
+        private val secondInstanceId = "second1"
     }
 
     private val flags = Flags()
@@ -35,17 +35,17 @@ class MainActivity : ComponentActivity() {
     private lateinit var secondInstance: RoxInstance
 
     class Flags : RoxContainer {
-        val fontColor = RoxString("blue")
-        val fontSize = RoxInt(16)
-        val message = RoxString("Hello from first instance!")
+//        val fontColor = RoxString("blue")
+//        val fontSize = RoxInt(16)
+        val message1 = RoxString("Hello from first instance!")
         val showMessage1 = RoxFlag(true)
     }
 
     class SecondFlags : RoxContainer {
-        val secondFontColor = RoxString("green")
-        val secondFontSize = RoxInt(20)
-        val secondMessage = RoxString("Hello from second instance!")
-        val showSecondMessage1 = RoxFlag(true)
+//        val secondFontColor = RoxString("green")
+//        val secondFontSize = RoxInt(20)
+        val secondMessage2 = RoxString("Hello from second instance!")
+        val showSecondMessage3 = RoxFlag(true)
     }
     private lateinit var instancesRecyclerView: RecyclerView
     private lateinit var instanceAdapter: InstanceAdapter
@@ -80,17 +80,20 @@ class MainActivity : ComponentActivity() {
         }
 
         // Initialize with loading state
-        instanceAdapter.updateInstances(instances.map {
-            InstanceItem(maskSdkKey(it.sdkKey), "Loading ${it.id} instance...")
-        })
+        instanceAdapter.updateInstances(listOf(
+            InstanceItem(maskSdkKey(firstSdkKey), "Loading first instance..."),
+            InstanceItem(maskSdkKey(secondSdkKey), "Loading second instance...")
+        ))
 
         // Create RoxOptions for first instance
         val firstOptions = RoxOptions.Builder()
             .withDisableSignatureVerification(true)
+            .withVerboseLevel(RoxOptions.VerboseLevel.VERBOSE_LEVEL_DEBUG)
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
                     fetcherResults?.let {
-                        runOnUiThread { updateInstancesUI() }
+                        android.util.Log.d("RoxTest", "First instance configuration fetched")
+                        checkFlagsValue()
                     }
                 }
             })
@@ -99,34 +102,51 @@ class MainActivity : ComponentActivity() {
         // Create RoxOptions for second instance
         val secondOptions = RoxOptions.Builder()
             .withDisableSignatureVerification(true)
+            .withVerboseLevel(RoxOptions.VerboseLevel.VERBOSE_LEVEL_DEBUG)
             .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
                 override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
                     fetcherResults?.let {
-                        runOnUiThread { updateInstancesUI() }
+                        android.util.Log.d("RoxTest", "Second instance configuration fetched")
+                        checkFlagsValue()
                     }
                 }
             })
             .build()
 
         try {
-            // Initialize first instance
+            android.util.Log.d("RoxTest", "Starting initialization of first instance")
+            android.util.Log.d("RoxTest", "Starting initialization of first instance")
             firstInstance = RoxManager.setup(firstInstanceId, application, firstSdkKey, firstOptions)!!
-            firstInstance.register(flags)
+            android.util.Log.d("RoxTest", "First instance setup complete")
+            
+            // Register first flags with empty namespace since this is default instance
+            firstInstance.register("", flags)
+            android.util.Log.d("RoxTest", "First instance registered flags with empty namespace")
             firstInstance.fetch()
 
-            // Initialize second instance
+            android.util.Log.d("RoxTest", "Starting initialization of second instance")
             secondInstance = RoxManager.setup(secondInstanceId, application, secondSdkKey, secondOptions)!!
-            secondInstance.register(secondFlags)
+            android.util.Log.d("RoxTest", "Second instance setup complete")
+            
+            // Register second flags with instance ID as namespace
+            secondInstance.register("",secondFlags)
+            
+            android.util.Log.d("RoxTest", "Second instance registered flags with namespace: $secondInstanceId")
             secondInstance.fetch()
         } catch (e: Exception) {
             runOnUiThread {
-                val errorInstances = instances.map { instance ->
+                val errorInstances = listOf(
                     InstanceItem(
-                        sdkKey = maskSdkKey(instance.sdkKey),
-                        value = "Error initializing instance: ${e.message}",
+                        sdkKey = maskSdkKey(firstSdkKey),
+                        value = "Error initializing first instance: ${e.message}",
+                        isVisible = true
+                    ),
+                    InstanceItem(
+                        sdkKey = maskSdkKey(secondSdkKey),
+                        value = "Error initializing second instance: ${e.message}",
                         isVisible = true
                     )
-                }
+                )
                 instanceAdapter.updateInstances(errorInstances)
             }
         }
@@ -161,39 +181,30 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun updateInstancesUI() {
-        val updatedInstances = instances.map { instance ->
-            when (instance.flags) {
-                is Flags -> {
-                    try {
-                        val flags = instance.flags as Flags
-                        InstanceItem(
-                            sdkKey = maskSdkKey(instance.sdkKey),
-                            value = flags.message.value,
-                            isVisible = flags.showMessage1.isEnabled,
-                            fontColor = flags.fontColor.value,
-                            fontSize = flags.fontSize.value
-                        )
-                    } catch (e: Exception) {
-                        InstanceItem(maskSdkKey(instance.sdkKey), "Error: ${e.message}", false)
-                    }
-                }
-                is SecondFlags -> {
-                    try {
-                        val flags = instance.flags as SecondFlags
-                        InstanceItem(
-                            sdkKey = maskSdkKey(instance.sdkKey),
-                            value = flags.secondMessage.value,
-                            isVisible = flags.showSecondMessage1.isEnabled,
-                            fontColor = flags.secondFontColor.value,
-                            fontSize = flags.secondFontSize.value
-                        )
-                    } catch (e: Exception) {
-                        InstanceItem(maskSdkKey(instance.sdkKey), "Error: ${e.message}", false)
-                    }
-                }
-                else -> InstanceItem(maskSdkKey(instance.sdkKey), "Unknown flag type", false)
+        val updatedInstances = listOf(
+            try {
+                InstanceItem(
+                    sdkKey = maskSdkKey(firstSdkKey),
+                    value = flags.message1.value,
+                    isVisible = flags.showMessage1.isEnabled,
+//                    fontColor = flags.fontColor.value,
+//                    fontSize = flags.fontSize.value
+                )
+            } catch (e: Exception) {
+                InstanceItem(maskSdkKey(firstSdkKey), "Error: ${e.message}", false)
+            },
+            try {
+                InstanceItem(
+                    sdkKey = maskSdkKey(secondSdkKey),
+                    value = secondFlags.secondMessage2.value,
+                    isVisible = secondFlags.showSecondMessage3.isEnabled,
+//                    fontColor = secondFlags.secondFontColor.value,
+//                    fontSize = secondFlags.secondFontSize.value
+                )
+            } catch (e: Exception) {
+                InstanceItem(maskSdkKey(secondSdkKey), "Error: ${e.message}", false)
             }
-        }
+        )
         runOnUiThread {
             instanceAdapter.updateInstances(updatedInstances)
         }
