@@ -11,8 +11,8 @@ import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.rollout.android.RoxInstance
-import io.rollout.android.RoxManager
+import io.rollout.android.Rox
+import io.rollout.android.RoxConfiguration
 import io.rollout.android.client.RoxOptions
 import io.rollout.configuration.RoxContainer
 import io.rollout.flags.RoxFlag
@@ -23,48 +23,36 @@ import io.rollout.client.FetcherResults
 
 class MainActivity : ComponentActivity() {
     companion object {
-        private val firstSdkKey = "5fff5164-414f-4bdd-b8d0-a42225e42c8b"
-        private val firstInstanceId = "default"
-        private val secondSdkKey = "f8fa95ff-5a6b-4677-94c1-c00c87afa023"
-        private val secondInstanceId = "second1"
+        private val firstSdkKey = "e07c0a49-4b1d-4c92-bce6-254ecf4ee1a6"
+        private val secondSdkKey = "0886c21c-123f-4976-b58c-284ee4e4e1fb"
     }
 
     private val flags = Flags()
     private val secondFlags = SecondFlags()
-    private lateinit var firstInstance: RoxInstance
-    private lateinit var secondInstance: RoxInstance
+    private lateinit var firstConfiguration: RoxConfiguration
+    private lateinit var secondConfiguration: RoxConfiguration
 
     class Flags : RoxContainer {
-//        val fontColor = RoxString("blue")
-//        val fontSize = RoxInt(16)
-        val message1 = RoxString("Hello from first instance!")
-        val showMessage1 = RoxFlag(true)
+        // These flags should auto-register on the dashboard if they don't exist
+        val message5 = RoxString("Hello from first instance!")
+        val showMessage5 = RoxFlag(true)
+        val titleColor5 = RoxString("Blue")
+        val titleSize5 = RoxString("16")
+        val maxRetries5 = RoxInt(3)
     }
 
     class SecondFlags : RoxContainer {
-//        val secondFontColor = RoxString("green")
-//        val secondFontSize = RoxInt(20)
-        val secondMessage2 = RoxString("Hello from second instance!")
-        val showSecondMessage3 = RoxFlag(true)
+        // These flags should auto-register on the dashboard if they don't exist
+        val secondMessage5 = RoxString("Hello from second instance!")
+        val showSecondMessage5 = RoxFlag(true)
+        val secondTitleColor5 = RoxString("Green")
+        val secondTitleSize5 = RoxString("18")
+        val secondMaxRetries5 = RoxInt(5)
     }
     private lateinit var instancesRecyclerView: RecyclerView
     private lateinit var instanceAdapter: InstanceAdapter
     private lateinit var connectivityManager: ConnectivityManager
-
-    private val instances = mutableListOf(
-        Instance(firstInstanceId, firstSdkKey, flags),
-        Instance(secondInstanceId, secondSdkKey, secondFlags)
-    )
-
-    data class Instance(
-        val id: String,
-        val sdkKey: String,
-        val flags: RoxContainer,
-        var roxInstance: RoxInstance? = null
-    )
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
-
-    // Note: Instance IDs are defined at the top of the class
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -114,25 +102,43 @@ class MainActivity : ComponentActivity() {
             .build()
 
         try {
-            android.util.Log.d("RoxTest", "Starting initialization of first instance")
-            android.util.Log.d("RoxTest", "Starting initialization of first instance")
-            firstInstance = RoxManager.setup(firstInstanceId, application, firstSdkKey, firstOptions)!!
-            android.util.Log.d("RoxTest", "First instance setup complete")
+            android.util.Log.d("RoxTest", "Starting initialization of first configuration")
+            // Create first configuration using new object-based API
+            firstConfiguration = Rox.add(firstSdkKey)
+            firstConfiguration.setup(application, firstOptions)
+            android.util.Log.d("RoxTest", "First configuration setup complete")
             
-            // Register first flags with empty namespace since this is default instance
-            firstInstance.register("", flags)
-            android.util.Log.d("RoxTest", "First instance registered flags with empty namespace")
-            firstInstance.fetch()
+            // Register first flags with "android" namespace
+            firstConfiguration.register("android", flags)
+            android.util.Log.d("RoxTest", "First configuration registered flags")
+            
+            // Set custom properties for first SDK instance
+            firstConfiguration.setCustomStringProperty("user_tier", "premium")
+            firstConfiguration.setCustomStringProperty("app_version", "1.2.0")
+            firstConfiguration.setCustomBooleanProperty("is_beta_user", true)
+            firstConfiguration.setCustomIntProperty("user_level", 42)
+            android.util.Log.d("RoxTest", "First configuration custom properties set")
+            
+            firstConfiguration.fetch()
 
-            android.util.Log.d("RoxTest", "Starting initialization of second instance")
-            secondInstance = RoxManager.setup(secondInstanceId, application, secondSdkKey, secondOptions)!!
-            android.util.Log.d("RoxTest", "Second instance setup complete")
+            android.util.Log.d("RoxTest", "Starting initialization of second configuration")
+            // Create second configuration using new object-based API
+            secondConfiguration = Rox.add(secondSdkKey)
+            secondConfiguration.setup(application, secondOptions)
+            android.util.Log.d("RoxTest", "Second configuration setup complete")
             
-            // Register second flags with instance ID as namespace
-            secondInstance.register("",secondFlags)
+            // Register second flags with empty namespace
+            secondConfiguration.register("", secondFlags)
             
-            android.util.Log.d("RoxTest", "Second instance registered flags with namespace: $secondInstanceId")
-            secondInstance.fetch()
+            // Set custom properties for second SDK instance (different values to test isolation)
+            secondConfiguration.setCustomStringProperty("user_tier", "basic")
+            secondConfiguration.setCustomStringProperty("app_version", "1.1.5")
+            secondConfiguration.setCustomBooleanProperty("is_beta_user", false)
+            secondConfiguration.setCustomIntProperty("user_level", 15)
+            android.util.Log.d("RoxTest", "Second configuration custom properties set")
+            
+            android.util.Log.d("RoxTest", "Second configuration registered flags")
+            secondConfiguration.fetch()
         } catch (e: Exception) {
             runOnUiThread {
                 val errorInstances = listOf(
@@ -185,10 +191,8 @@ class MainActivity : ComponentActivity() {
             try {
                 InstanceItem(
                     sdkKey = maskSdkKey(firstSdkKey),
-                    value = flags.message1.value,
-                    isVisible = flags.showMessage1.isEnabled,
-//                    fontColor = flags.fontColor.value,
-//                    fontSize = flags.fontSize.value
+                    value = "${flags.message5.value} | Color: ${flags.titleColor5.value} (Size: ${flags.titleSize5.value}) | Retries: ${flags.maxRetries5.value}",
+                    isVisible = flags.showMessage5.isEnabled
                 )
             } catch (e: Exception) {
                 InstanceItem(maskSdkKey(firstSdkKey), "Error: ${e.message}", false)
@@ -196,10 +200,8 @@ class MainActivity : ComponentActivity() {
             try {
                 InstanceItem(
                     sdkKey = maskSdkKey(secondSdkKey),
-                    value = secondFlags.secondMessage2.value,
-                    isVisible = secondFlags.showSecondMessage3.isEnabled,
-//                    fontColor = secondFlags.secondFontColor.value,
-//                    fontSize = secondFlags.secondFontSize.value
+                    value = "${secondFlags.secondMessage5.value} | Color: ${secondFlags.secondTitleColor5.value} (Size: ${secondFlags.secondTitleSize5.value}) | Retries: ${secondFlags.secondMaxRetries5.value}",
+                    isVisible = secondFlags.showSecondMessage5.isEnabled
                 )
             } catch (e: Exception) {
                 InstanceItem(maskSdkKey(secondSdkKey), "Error: ${e.message}", false)

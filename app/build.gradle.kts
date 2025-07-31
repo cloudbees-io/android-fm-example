@@ -50,7 +50,7 @@ android {
 }
 
 dependencies {
-    implementation("io.rollout.rox:rox-android:6.0.1-SNAPSHOT")
+    implementation("io.rollout.rox:rox-android:6.0.2")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
