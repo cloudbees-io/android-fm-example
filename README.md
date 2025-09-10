@@ -75,6 +75,21 @@ Table 1. Feature flags in the example application.
 6. Update a flag value and save your changes.  
 7. Set the **Configuration status** to **On**.  
 
+**Use the application with multiple SDK keys:**
+
+Run multiple instances of the SDK in a single application, each with its own SDK key and environment. Each instance is fully isolated. Use this when you need to read or compare flags across environments without redeploying, support multi-tenant routing, or combine server-side and client-side evaluations in one application.
+
+To use multiple SDK keys in the example Kotlin Android application, follow these steps:
+
+. Retrieve the SDK keys for the environments you’ll use.
+. Initialize a separate SDK instance for each key.
+. Decide how to route requests to instances (for example, by tenant, region, or environment selector).
+. Perform register/fetch/stream setup on each instance as required by your SDK.
+. Evaluate flags using the selected instance. Pass a consistent user/context object for accurate targeting.
+. Tag logs or metrics by instance, and shut down instances you no longer need.
+
+For more information about using multiple SDK keys, refer to https://docs.cloudbees.com/docs/cloudbees-platform/latest/feature-management/use-multiple-sdk-keys. 
+
 ## Documentation reference  
 
 Refer to the CloudBees cloud-native platform documentation, link:https://docs.cloudbees.com/docs/cloudbees-platform/latest/install-sdk/[install the Feature management SDK] for more information.  
