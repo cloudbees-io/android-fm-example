@@ -81,15 +81,15 @@ Run multiple instances of the SDK in a single application, each with its own SDK
 
 To use multiple SDK keys in the example Kotlin Android application, follow these steps:
 
-. Retrieve the SDK keys for the environments you’ll use.
-. Initialize a separate SDK instance for each key.
-. Decide how to route requests to instances (for example, by tenant, region, or environment selector).
-. Perform register/fetch/stream setup on each instance as required by your SDK.
-. Evaluate flags using the selected instance. Pass a consistent user/context object for accurate targeting.
-. Tag logs or metrics by instance, and shut down instances you no longer need.
-
-For more information about using multiple SDK keys, refer to https://docs.cloudbees.com/docs/cloudbees-platform/latest/feature-management/use-multiple-sdk-keys. 
+1. Retrieve the SDK keys for the environments you’ll use.
+2. Initialize a separate SDK instance for each key.
+3. Decide how to route requests to instances (for example, by tenant, region, or environment selector).
+4. Perform register/fetch/stream setup on each instance as required by your SDK.
+5. Evaluate flags using the selected instance. Pass a consistent user/context object for accurate targeting.
+6. Tag logs or metrics by instance, and shut down instances you no longer need.
 
 ## Documentation reference  
 
-Refer to the CloudBees cloud-native platform documentation, link:https://docs.cloudbees.com/docs/cloudbees-platform/latest/install-sdk/[install the Feature management SDK] for more information.  
+- For more information about using multiple SDK keys, refer to https://docs.cloudbees.com/docs/cloudbees-platform/latest/feature-management/use-multiple-sdk-keys. 
+
+- Refer to the CloudBees cloud-native platform documentation, link:https://docs.cloudbees.com/docs/cloudbees-platform/latest/install-sdk/[install the Feature management SDK] for more information.  
