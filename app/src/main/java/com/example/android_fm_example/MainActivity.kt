@@ -1,18 +1,15 @@
 package com.example.android_fm_example
 
 import android.content.Context
-import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Bundle
-import android.view.View
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import io.rollout.android.Rox
-import io.rollout.android.RoxConfiguration
+import io.rollout.android.RoxInstance
 import io.rollout.android.client.RoxOptions
 import io.rollout.configuration.RoxContainer
 import io.rollout.flags.RoxFlag
@@ -23,31 +20,31 @@ import io.rollout.client.FetcherResults
 
 class MainActivity : ComponentActivity() {
     companion object {
-        private val firstSdkKey = "e07c0a49-4b1d-4c92-bce6-254ecf4ee1a6"
-        private val secondSdkKey = "0886c21c-123f-4976-b58c-284ee4e4e1fb"
+        private val firstSdkKey = "<FIRST-ROLLOUT-SDK-KEY>"
+        private val secondSdkKey = "<SECOND-ROLLOUT-SDK-KEY>"
     }
 
     private val flags = Flags()
     private val secondFlags = SecondFlags()
-    private lateinit var firstConfiguration: RoxConfiguration
-    private lateinit var secondConfiguration: RoxConfiguration
+    private lateinit var firstConfiguration: RoxInstance
+    private lateinit var secondConfiguration: RoxInstance
 
     class Flags : RoxContainer {
         // These flags should auto-register on the dashboard if they don't exist
-        val message5 = RoxString("Hello from first instance!")
-        val showMessage5 = RoxFlag(true)
-        val titleColor5 = RoxString("Blue")
-        val titleSize5 = RoxString("16")
-        val maxRetries5 = RoxInt(3)
+        val message = RoxString("Hello from first instance!")
+        val showMessage = RoxFlag(true)
+        val titleColor = RoxString("Blue")
+        val titleSize = RoxString("16")
+        val maxRetries = RoxInt(3)
     }
 
     class SecondFlags : RoxContainer {
         // These flags should auto-register on the dashboard if they don't exist
-        val secondMessage5 = RoxString("Hello from second instance!")
-        val showSecondMessage5 = RoxFlag(true)
-        val secondTitleColor5 = RoxString("Green")
-        val secondTitleSize5 = RoxString("18")
-        val secondMaxRetries5 = RoxInt(5)
+        val secondMessage = RoxString("Hello from second instance!")
+        val showSecondMessage = RoxFlag(true)
+        val secondTitleColor = RoxString("Green")
+        val secondTitleSize = RoxString("18")
+        val secondMaxRetries = RoxInt(5)
     }
     private lateinit var instancesRecyclerView: RecyclerView
     private lateinit var instanceAdapter: InstanceAdapter
@@ -191,8 +188,8 @@ class MainActivity : ComponentActivity() {
             try {
                 InstanceItem(
                     sdkKey = maskSdkKey(firstSdkKey),
-                    value = "${flags.message5.value} | Color: ${flags.titleColor5.value} (Size: ${flags.titleSize5.value}) | Retries: ${flags.maxRetries5.value}",
-                    isVisible = flags.showMessage5.isEnabled
+                    value = "${flags.message.value} | Color: ${flags.titleColor.value} (Size: ${flags.titleSize.value}) | Retries: ${flags.maxRetries.value}",
+                    isVisible = flags.showMessage.isEnabled
                 )
             } catch (e: Exception) {
                 InstanceItem(maskSdkKey(firstSdkKey), "Error: ${e.message}", false)
@@ -200,8 +197,8 @@ class MainActivity : ComponentActivity() {
             try {
                 InstanceItem(
                     sdkKey = maskSdkKey(secondSdkKey),
-                    value = "${secondFlags.secondMessage5.value} | Color: ${secondFlags.secondTitleColor5.value} (Size: ${secondFlags.secondTitleSize5.value}) | Retries: ${secondFlags.secondMaxRetries5.value}",
-                    isVisible = secondFlags.showSecondMessage5.isEnabled
+                    value = "${secondFlags.secondMessage.value} | Color: ${secondFlags.secondTitleColor.value} (Size: ${secondFlags.secondTitleSize.value}) | Retries: ${secondFlags.secondMaxRetries.value}",
+                    isVisible = secondFlags.showSecondMessage.isEnabled
                 )
             } catch (e: Exception) {
                 InstanceItem(maskSdkKey(secondSdkKey), "Error: ${e.message}", false)
@@ -220,13 +217,4 @@ class MainActivity : ComponentActivity() {
         updateInstancesUI()
     }
 
-    private fun getColorFromFlag(color: String): Int {
-        return when (color.lowercase()) {
-            "red" -> Color.RED
-            "blue" -> Color.BLUE
-            "green" -> Color.GREEN
-            "yellow" -> Color.YELLOW
-            else -> Color.BLACK
-        }
-    }
 }

@@ -18,6 +18,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         mavenLocal()
+        flatDir {
+            dirs("${rootProject.projectDir}/app/libs")
+        }
     }
 }
 

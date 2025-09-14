@@ -50,7 +50,10 @@ android {
 }
 
 dependencies {
-    implementation("io.rollout.rox:rox-android:6.0.2")
+    // Local JAR and AAR files instead of Maven dependencies
+    implementation(files("libs/rox-java-core-6.0.2.jar"))
+    implementation(files("libs/rox-android-release.aar"))
+    
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
