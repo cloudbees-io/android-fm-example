@@ -33,6 +33,7 @@ build/
 
 # Package Files #
 *.jar
+!app/libs/*.jar  # Exception to allow JAR files in the app/libs directory
 *.war
 *.nar
 *.ear
