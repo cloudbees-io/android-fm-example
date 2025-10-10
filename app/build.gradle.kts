@@ -51,7 +51,7 @@ android {
 
 dependencies {
     // Local JAR and AAR files instead of Maven dependencies
-    implementation(files("libs/rox-java-core-6.0.2.jar"))
+    implementation(files("libs/rox-java-core-6.0.1.jar"))
     implementation(files("libs/rox-android-release.aar"))
     
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")

@@ -14,9 +14,9 @@ import io.rollout.android.client.RoxOptions
 import io.rollout.configuration.RoxContainer
 import io.rollout.flags.RoxFlag
 import io.rollout.flags.RoxString
-import io.rollout.flags.RoxInt
 import io.rollout.client.ConfigurationFetchedHandler
 import io.rollout.client.FetcherResults
+import io.rollout.flags.RoxInt
 
 class MainActivity : ComponentActivity() {
     companion object {
@@ -49,6 +49,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var instancesRecyclerView: RecyclerView
     private lateinit var instanceAdapter: InstanceAdapter
     private lateinit var connectivityManager: ConnectivityManager
+
     private lateinit var networkCallback: ConnectivityManager.NetworkCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,15 +101,16 @@ class MainActivity : ComponentActivity() {
 
         try {
             android.util.Log.d("RoxTest", "Starting initialization of first configuration")
-            // Create first configuration using new object-based API
-            firstConfiguration = Rox.add(firstSdkKey)
-            firstConfiguration.setup(application, firstOptions)
+
+            firstConfiguration = Rox.instance(firstSdkKey)
+
             android.util.Log.d("RoxTest", "First configuration setup complete")
-            
+            firstConfiguration.setup(application, firstOptions)
             // Register first flags with "android" namespace
             firstConfiguration.register("android", flags)
+
             android.util.Log.d("RoxTest", "First configuration registered flags")
-            
+
             // Set custom properties for first SDK instance
             firstConfiguration.setCustomStringProperty("user_tier", "premium")
             firstConfiguration.setCustomStringProperty("app_version", "1.2.0")
@@ -120,13 +122,14 @@ class MainActivity : ComponentActivity() {
 
             android.util.Log.d("RoxTest", "Starting initialization of second configuration")
             // Create second configuration using new object-based API
-            secondConfiguration = Rox.add(secondSdkKey)
-            secondConfiguration.setup(application, secondOptions)
+            secondConfiguration = Rox.instance(secondSdkKey)
+
             android.util.Log.d("RoxTest", "Second configuration setup complete")
             
             // Register second flags with empty namespace
-            secondConfiguration.register("", secondFlags)
-            
+            secondConfiguration.register(secondFlags)
+
+
             // Set custom properties for second SDK instance (different values to test isolation)
             secondConfiguration.setCustomStringProperty("user_tier", "basic")
             secondConfiguration.setCustomStringProperty("app_version", "1.1.5")
@@ -135,7 +138,9 @@ class MainActivity : ComponentActivity() {
             android.util.Log.d("RoxTest", "Second configuration custom properties set")
             
             android.util.Log.d("RoxTest", "Second configuration registered flags")
-            secondConfiguration.fetch()
+
+            secondConfiguration.setup(application, secondOptions)
+
         } catch (e: Exception) {
             runOnUiThread {
                 val errorInstances = listOf(
