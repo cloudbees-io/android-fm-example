@@ -19,11 +19,40 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp" />
 
+        <!-- Container Flags Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Container Flags:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:textColor="#555555" />
+
         <TextView
             android:id="@+id/instanceValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Dynamic API Section -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dynamic API Flags:"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="#0066cc"
+            android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/dynamicApiValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:layout_marginTop="4dp" />
 
     </LinearLayout>
 

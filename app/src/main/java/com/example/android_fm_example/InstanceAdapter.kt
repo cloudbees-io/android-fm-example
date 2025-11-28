@@ -12,7 +12,8 @@ data class InstanceItem(
     val value: String,
     val isVisible: Boolean = true,
     val fontColor: String = "black",
-    val fontSize: Int = 16
+    val fontSize: Int = 16,
+    val dynamicApiValues: String = ""
 )
 
 class InstanceAdapter : RecyclerView.Adapter<InstanceAdapter.ViewHolder>() {
@@ -21,6 +22,7 @@ class InstanceAdapter : RecyclerView.Adapter<InstanceAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val titleText: TextView = view.findViewById(R.id.instanceTitle)
         val valueText: TextView = view.findViewById(R.id.instanceValue)
+        val dynamicApiText: TextView = view.findViewById(R.id.dynamicApiValue)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -37,6 +39,10 @@ class InstanceAdapter : RecyclerView.Adapter<InstanceAdapter.ViewHolder>() {
             visibility = if (instance.isVisible) View.VISIBLE else View.GONE
             setTextColor(getColorFromFlag(instance.fontColor))
             textSize = instance.fontSize.toFloat()
+        }
+        holder.dynamicApiText.apply {
+            text = instance.dynamicApiValues.ifEmpty { "No dynamic flags" }
+            visibility = View.VISIBLE
         }
     }
 
