@@ -28,8 +28,8 @@ class MainActivity : ComponentActivity() {
 
     companion object {
         private const val TAG = "RoxTest"
-        private const val FIRST_SDK_KEY = "<FIRST-SDK-KEY>"
-        private const val SECOND_SDK_KEY = "<SECOND-SDK-KEY>"
+        private const val FIRST_SDK_KEY = "65809bbb-4798-410d-9cf4-2c9fa4720c08"
+        private const val SECOND_SDK_KEY = "7e1cc490-3239-4243-9610-234919b50b53"
     }
 
     // Flag containers for each SDK instance
@@ -53,8 +53,8 @@ class MainActivity : ComponentActivity() {
      * These flags auto-register on the dashboard if they don't exist.
      */
     class FirstFlags : RoxContainer {
-        val message_p6 = RoxString("Hello from first instance!")
-        val showMessage_p6 = RoxFlag(true)
+        val message_p7 = RoxString("Hello from first instance!")
+        val showMessage_p7 = RoxFlag(true)
         val titleColor = RoxString("Blue")
         val titleSize = RoxString("16")
         val maxRetries = RoxInt(3)
@@ -65,8 +65,8 @@ class MainActivity : ComponentActivity() {
      * These flags auto-register on the dashboard if they don't exist.
      */
     class SecondFlags : RoxContainer {
-        val secondMessage_p6 = RoxString("Hello from second instance!")
-        val showSecondMessage_p6 = RoxFlag(true)
+        val secondMessage_p7 = RoxString("Hello from second instance!")
+        val showSecondMessage_p7 = RoxFlag(true)
         val secondTitleColor = RoxString("Green")
         val secondTitleSize = RoxString("18")
         val secondMaxRetries = RoxInt(5)
@@ -82,9 +82,6 @@ class MainActivity : ComponentActivity() {
         initializeSdkInstances()
         setupNetworkMonitoring()
         updateInstancesUI()
-
-        // Demonstrate Dynamic API usage after SDK initialization
-        demonstrateDynamicAPI()
     }
 
     override fun onStart() {
@@ -267,20 +264,20 @@ class MainActivity : ComponentActivity() {
             createInstanceItem(
                 sdkKey = FIRST_SDK_KEY,
                 configuration = firstConfiguration,
-                message = firstFlags.message_p6.value,
+                message = firstFlags.message_p7.value,
                 color = firstFlags.titleColor.value,
                 size = firstFlags.titleSize.value,
                 retries = firstFlags.maxRetries.value,
-                isVisible = firstFlags.showMessage_p6.isEnabled
+                isVisible = firstFlags.showMessage_p7.isEnabled
             ),
             createInstanceItem(
                 sdkKey = SECOND_SDK_KEY,
                 configuration = secondConfiguration,
-                message = secondFlags.secondMessage_p6.value,
+                message = secondFlags.secondMessage_p7.value,
                 color = secondFlags.secondTitleColor.value,
                 size = secondFlags.secondTitleSize.value,
                 retries = secondFlags.secondMaxRetries.value,
-                isVisible = secondFlags.showSecondMessage_p6.isEnabled
+                isVisible = secondFlags.showSecondMessage_p7.isEnabled
             )
         )
         runOnUiThread {
@@ -310,7 +307,7 @@ class MainActivity : ComponentActivity() {
         isVisible: Boolean
     ): InstanceItem {
         return try {
-            val dynamicApiValues = getDynamicApiValues(configuration)
+            val dynamicApiValues = getDynamicApiValues(configuration, sdkKey)
             InstanceItem(
                 sdkKey = maskSdkKey(sdkKey),
                 value = "$message | Color: $color (Size: $size) | Retries: $retries",
@@ -330,20 +327,41 @@ class MainActivity : ComponentActivity() {
 
     /**
      * Gets Dynamic API flag values for display in UI.
+     * Each instance uses different flag names to demonstrate proper isolation.
      *
      * @param configuration The RoxInstance configuration
+     * @param sdkKey The SDK key to determine which flags to check
      * @return Formatted string with Dynamic API flag values
      */
-    private fun getDynamicApiValues(configuration: RoxInstance): String {
+    private fun getDynamicApiValues(configuration: RoxInstance, sdkKey: String): String {
         return try {
             val dynamicAPI = configuration.getDynamicAPI()
 
-            // Get Dynamic API values - simplified to 2 flags
-            val featureEnabled = dynamicAPI.isEnabled("dynamic_feature_flag", false)
-            val welcomeMsg = dynamicAPI.getValue("dynamic_welcome_message", "Default Welcome!")
+            // Use instance-specific flag names to demonstrate proper isolation
+            val (featureFlagName, welcomeMsgName, defaultMsg) = when (sdkKey) {
+                FIRST_SDK_KEY -> Triple(
+                    "dynamic_feature_flag_first",
+                    "dynamic_welcome_message_first",
+                    "First Instance Welcome"
+                )
+                SECOND_SDK_KEY -> Triple(
+                    "dynamic_feature_flag_second",
+                    "dynamic_welcome_message_second",
+                    "Second Instance Welcome"
+                )
+                else -> Triple(
+                    "dynamic_feature_flag",
+                    "dynamic_welcome_message",
+                    "Default Welcome"
+                )
+            }
+
+            // Get Dynamic API values with instance-specific flag names
+            val featureEnabled = dynamicAPI.isEnabled(featureFlagName, false)
+            val welcomeMsg = dynamicAPI.getValue(welcomeMsgName, defaultMsg)
 
             buildString {
-                append("✓ Feature Flag: $featureEnabled\n")
+                append("✓ Feature Flag ($featureFlagName): $featureEnabled\n")
                 append("✓ Welcome Message: \"$welcomeMsg\"")
             }
         } catch (e: Exception) {
@@ -360,144 +378,5 @@ class MainActivity : ComponentActivity() {
      */
     private fun maskSdkKey(key: String): String {
         return if (key.length > 4) "${key.take(4)}****" else key
-    }
-
-    /**
-     * Demonstrates Dynamic API usage for both SDK instances.
-     *
-     * The Dynamic API allows you to check flags and get values without pre-defining them
-     * in RoxContainer classes. This is useful for:
-     * - Quick testing and experimentation
-     * - Dynamic flag names determined at runtime
-     * - Third-party integrations that need flag access
-     */
-    private fun demonstrateDynamicAPI() {
-        Log.d(TAG, "\n========== DYNAMIC API DEMONSTRATION ==========")
-
-        // Get Dynamic API instances
-        val firstDynamicAPI = firstConfiguration.getDynamicAPI()
-        val secondDynamicAPI = secondConfiguration.getDynamicAPI()
-
-        demonstrateFirstInstanceDynamicAPI(firstDynamicAPI)
-        demonstrateSecondInstanceDynamicAPI(secondDynamicAPI)
-
-        // Test context-based targeting
-        demonstrateDynamicAPIWithContext(firstDynamicAPI)
-        demonstrateDynamicAPIWithContext(secondDynamicAPI)
-
-        Log.d(TAG, "========== END DYNAMIC API DEMONSTRATION ==========\n")
-    }
-
-    /**
-     * Demonstrates Dynamic API usage for the first SDK instance.
-     */
-    private fun demonstrateFirstInstanceDynamicAPI(dynamicAPI: DynamicAPI) {
-        Log.d(TAG, "\n--- First Instance Dynamic API ---")
-
-        // 1. Check if a flag is enabled (boolean)
-        val showDynamicFeature = dynamicAPI.isEnabled("dynamic_feature_flag", false)
-        Log.d(TAG, "Dynamic Feature Flag (isEnabled): $showDynamicFeature")
-
-        // 2. Get string value
-        val welcomeMessage = dynamicAPI.getValue("dynamic_welcome_message", "Default Welcome")
-        Log.d(TAG, "Dynamic Welcome Message: $welcomeMessage")
-    }
-
-    /**
-     * Demonstrates Dynamic API usage for the second SDK instance.
-     */
-    private fun demonstrateSecondInstanceDynamicAPI(dynamicAPI: DynamicAPI) {
-        Log.d(TAG, "\n--- Second Instance Dynamic API ---")
-
-        // Verify instance isolation - same flag names should have different values
-        val featureEnabled = dynamicAPI.isEnabled("dynamic_feature_flag", true)
-        Log.d(TAG, "Second Instance Feature Flag: $featureEnabled")
-
-        val message = dynamicAPI.getValue("dynamic_welcome_message", "Second Instance Default")
-        Log.d(TAG, "Second Instance Welcome Message: $message")
-    }
-
-    /**
-     * Demonstrates Dynamic API with custom context for targeting.
-     * Context allows you to pass additional properties for flag evaluation.
-     */
-    private fun demonstrateDynamicAPIWithContext(dynamicAPI: DynamicAPI) {
-        Log.d(TAG, "\n--- Dynamic API with Context ---")
-
-        // Create a context with custom properties for targeting
-        val contextMap = mapOf(
-            "user_id" to "user_12345" as Any,
-            "subscription_tier" to "premium" as Any,
-            "device_type" to "tablet" as Any
-        )
-        val context = io.rollout.context.Context.Builder().from(contextMap)
-
-        // Check flag with context
-        val premiumFeature = dynamicAPI.isEnabled("premium_feature", false, context)
-        Log.d(TAG, "Premium Feature (with context): $premiumFeature")
-
-        // Get value with context
-        val personalizedMessage = dynamicAPI.getValue(
-            "personalized_message",
-            "Hello User!",
-            context
-        )
-        Log.d(TAG, "Personalized Message (with context): $personalizedMessage")
-
-        // Get int with context
-        val userQuota = dynamicAPI.getInt("user_quota", 100, context)
-        Log.d(TAG, "User Quota (with context): $userQuota")
-
-        // Get double with context
-        val userDiscount = dynamicAPI.getDouble("user_discount", 5.0, context)
-        Log.d(TAG, "User Discount (with context): $userDiscount%")
-    }
-
-    /**
-     * Demonstrates Dynamic API with predefined variations.
-     * Variations allow you to specify custom options instead of just default values.
-     */
-    private fun demonstrateDynamicAPIWithVariations(dynamicAPI: DynamicAPI) {
-        Log.d(TAG, "\n--- Dynamic API with Variations ---")
-
-        // String variations - possible theme options
-        val themeOptions = arrayOf("light", "dark", "auto", "high-contrast")
-        val selectedTheme = dynamicAPI.getValue(
-            "app_theme",
-            "light",  // default
-            themeOptions
-        )
-        Log.d(TAG, "Selected Theme: $selectedTheme (options: ${themeOptions.joinToString()})")
-
-        // Int variations - possible timeout values in milliseconds
-        val timeoutOptions = intArrayOf(1000, 3000, 5000, 10000)
-        val connectionTimeout = dynamicAPI.getInt(
-            "connection_timeout",
-            3000,  // default
-            timeoutOptions
-        )
-        Log.d(TAG, "Connection Timeout: $connectionTimeout ms (options: ${timeoutOptions.joinToString()})")
-
-        // Double variations - possible price points
-        val priceOptions = doubleArrayOf(9.99, 19.99, 29.99, 49.99)
-        val subscriptionPrice = dynamicAPI.getDouble(
-            "subscription_price",
-            19.99,  // default
-            priceOptions
-        )
-        Log.d(TAG, "Subscription Price: $$subscriptionPrice (options: ${priceOptions.joinToString { "$$it" }})")
-
-        // Variations with context
-        val contextMap = mapOf("user_segment" to "enterprise" as Any)
-        val context = io.rollout.context.Context.Builder().from(contextMap)
-
-        val featureTiers = arrayOf("basic", "pro", "enterprise")
-        val userTier = dynamicAPI.getValue(
-            "feature_tier",
-            "basic",
-            featureTiers,
-            context
-        )
-        Log.d(TAG, "Feature Tier (with context): $userTier (options: ${featureTiers.joinToString()})")
     }
 }
