@@ -13,7 +13,6 @@ import io.rollout.android.Rox
 import io.rollout.android.RoxInstance
 import io.rollout.android.client.RoxOptions
 import io.rollout.client.ConfigurationFetchedHandler
-import io.rollout.client.DynamicAPI
 import io.rollout.client.FetcherResults
 import io.rollout.configuration.RoxContainer
 import io.rollout.flags.RoxFlag
@@ -25,11 +24,11 @@ import io.rollout.flags.RoxString
  * This activity manages two separate SDK instances with different configurations and custom properties.
  */
 class MainActivity : ComponentActivity() {
-
+//
     companion object {
         private const val TAG = "RoxTest"
-        private const val FIRST_SDK_KEY = "65809bbb-4798-410d-9cf4-2c9fa4720c08"
-        private const val SECOND_SDK_KEY = "7e1cc490-3239-4243-9610-234919b50b53"
+        private const val FIRST_SDK_KEY = "<FIRST-SDK-KEY>"
+        private const val SECOND_SDK_KEY = "<SECOND-SDK-KEY>"
     }
 
     // Flag containers for each SDK instance
@@ -53,8 +52,8 @@ class MainActivity : ComponentActivity() {
      * These flags auto-register on the dashboard if they don't exist.
      */
     class FirstFlags : RoxContainer {
-        val message_p7 = RoxString("Hello from first instance!")
-        val showMessage_p7 = RoxFlag(true)
+        val message = RoxString("Hello from first instance!")
+        val showMessage = RoxFlag(true)
         val titleColor = RoxString("Blue")
         val titleSize = RoxString("16")
         val maxRetries = RoxInt(3)
@@ -65,8 +64,8 @@ class MainActivity : ComponentActivity() {
      * These flags auto-register on the dashboard if they don't exist.
      */
     class SecondFlags : RoxContainer {
-        val secondMessage_p7 = RoxString("Hello from second instance!")
-        val showSecondMessage_p7 = RoxFlag(true)
+        val secondMessage = RoxString("Hello from second instance!")
+        val showSecondMessage = RoxFlag(true)
         val secondTitleColor = RoxString("Green")
         val secondTitleSize = RoxString("18")
         val secondMaxRetries = RoxInt(5)
@@ -148,7 +147,7 @@ class MainActivity : ComponentActivity() {
 
         // Set custom properties for first SDK instance
         firstConfiguration.apply {
-            setCustomStringProperty("user_version__p1", "premium")
+            setCustomStringProperty("user_version", "premium")
             setCustomStringProperty("app_version", "1.2.0")
             setCustomBooleanProperty("is_beta_user", true)
             setCustomIntProperty("user_level", 42)
@@ -174,7 +173,7 @@ class MainActivity : ComponentActivity() {
 
         // Set custom properties for second SDK instance (different values to test isolation)
         secondConfiguration.apply {
-            setCustomStringProperty("2_user_version__p1", "basic")
+            setCustomStringProperty("user_version", "basic")
             setCustomStringProperty("app_version", "1.1.5")
             setCustomBooleanProperty("is_beta_user", false)
             setCustomIntProperty("user_level", 15)
@@ -264,20 +263,20 @@ class MainActivity : ComponentActivity() {
             createInstanceItem(
                 sdkKey = FIRST_SDK_KEY,
                 configuration = firstConfiguration,
-                message = firstFlags.message_p7.value,
+                message = firstFlags.message.value,
                 color = firstFlags.titleColor.value,
                 size = firstFlags.titleSize.value,
                 retries = firstFlags.maxRetries.value,
-                isVisible = firstFlags.showMessage_p7.isEnabled
+                isVisible = firstFlags.showMessage.isEnabled
             ),
             createInstanceItem(
                 sdkKey = SECOND_SDK_KEY,
                 configuration = secondConfiguration,
-                message = secondFlags.secondMessage_p7.value,
+                message = secondFlags.secondMessage.value,
                 color = secondFlags.secondTitleColor.value,
                 size = secondFlags.secondTitleSize.value,
                 retries = secondFlags.secondMaxRetries.value,
-                isVisible = secondFlags.showSecondMessage_p7.isEnabled
+                isVisible = secondFlags.showSecondMessage.isEnabled
             )
         )
         runOnUiThread {
