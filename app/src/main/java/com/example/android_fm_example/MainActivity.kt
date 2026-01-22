@@ -141,7 +141,24 @@ class MainActivity : ComponentActivity() {
 
         firstConfiguration = Rox.instance(FIRST_SDK_KEY)
 
-        val options = createRoxOptions("First instance")
+        val options = RoxOptions.Builder()
+            .withDisableSignatureVerification(true)
+            .withVerboseLevel(RoxOptions.VerboseLevel.VERBOSE_LEVEL_DEBUG)
+            .withConfigurationFetchedHandler(object : ConfigurationFetchedHandler {
+                override fun onConfigurationFetched(fetcherResults: FetcherResults?) {
+                    fetcherResults?.let {
+                        Log.d(TAG, "First instance configuration fetched - updating UI")
+                        updateInstancesUI()
+
+                        // Run target groups validation after configuration is fetched
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            TargetGroupsValidation.validateAllApproaches(firstConfiguration)
+                        }, 1000) // Wait 1 second to ensure configuration is fully loaded
+                    }
+                }
+            })
+            .build()
+
         firstConfiguration.setup(application, options)
         firstConfiguration.register("android", firstFlags)
 
