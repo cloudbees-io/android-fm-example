@@ -21,4 +21,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "android-fm-example"
 include(":app")
- 
